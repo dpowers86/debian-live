@@ -79,6 +79,6 @@ xorriso \
     "${HOME}/LIVE_BOOT/staging"
 
 echo Copy output
-cp -v $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
-chmod -v 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
+cp -v $HOME/LIVE_BOOT/debian-custom.iso /output/debian10-minimal-x86_64.iso
+chmod -v 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian10-minimal-x86_64.iso
 ls -lah /output

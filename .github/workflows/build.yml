@@ -9,6 +9,7 @@ on:
   push:
     paths-ignore:
       - 'README.md'
+      - 'LICENSE'
 
   workflow_dispatch:
 
@@ -33,5 +34,5 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            output/debian-custom.iso
+            output/debian10-minimal-x86_64.iso
             output/packages.txt
