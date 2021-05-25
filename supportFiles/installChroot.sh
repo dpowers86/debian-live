@@ -17,13 +17,17 @@ update-locale LANG=en_US.UTF-8
 
 echo Install packages
 apt-get install -y --no-install-recommends linux-image-amd64 live-boot systemd-sysv
-apt-get install -y bash-completion cifs-utils curl dosfstools firmware-linux-free gddrescue gdisk iputils-ping isc-dhcp-client less nfs-common ntfs-3g openssh-client open-vm-tools procps vim wimtools wget
+apt-get install -y bash-completion cifs-utils curl dbus dosfstools firmware-linux-free gddrescue gdisk iputils-ping isc-dhcp-client less nfs-common ntfs-3g openssh-client open-vm-tools procps vim wimtools wget
 
 echo Clean apt post-install
 apt-get clean
 
 echo Enable systemd-networkd as network manager
 systemctl enable systemd-networkd
+
+echo Set resolv.conf to use systemd-resolved
+rm /etc/resolv.conf
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 echo Set root password
 echo "root:toor" | chpasswd
