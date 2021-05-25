@@ -14,11 +14,15 @@ jobs:
     runs-on: "ubuntu-20.04"
 
     steps:
+      - name: "Checking out git repository"
+        uses: actions/checkout@v2
+
       - name: "Build Image"
         run: |
           ./build.sh
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: "Publish"
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
