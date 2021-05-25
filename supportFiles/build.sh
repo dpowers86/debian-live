@@ -15,17 +15,17 @@ echo Copy supporting documents into the chroot
 cp -v /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh
 cp -v /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
 
-echo Copy in systemd-networkd config
-cp -v /supportFiles/99-dhcp-en.network $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
-chown -v root:root $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
-chmod -v 644 $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
-
 echo Run install script inside chroot
 chroot $HOME/LIVE_BOOT/chroot /installChroot.sh
 
 echo Cleanup chroot
 rm -v $HOME/LIVE_BOOT/chroot/installChroot.sh
 mv -v $HOME/LIVE_BOOT/chroot/packages.txt /output/packages.txt
+
+echo Copy in systemd-networkd config
+cp -v /supportFiles/99-dhcp-en.network $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
+chown -v root:root $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
+chmod -v 644 $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
 
 echo Create directories that will contain files for our live environment files and scratch files.
 mkdir -p $HOME/LIVE_BOOT/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
