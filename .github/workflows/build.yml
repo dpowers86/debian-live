@@ -30,3 +30,4 @@ jobs:
           title: "Development Build"
           files: |
             output/debian-custom.iso
+            output/packages.txt
