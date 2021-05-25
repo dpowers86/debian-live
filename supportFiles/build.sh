@@ -18,6 +18,10 @@ cp /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
 echo Run install script inside chroot
 chroot $HOME/LIVE_BOOT/chroot /installChroot.sh
 
+echo Cleanup chroot
+rm $HOME/LIVE_BOOT/chroot/installChroot.sh
+mv $HOME/LIVE_BOOT/chroot/packages.txt /output/packages.txt
+
 echo Create directories that will contain files for our live environment files and scratch files.
 mkdir -p $HOME/LIVE_BOOT/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
 
@@ -72,6 +76,4 @@ xorriso \
 echo Copy output
 cp $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
 chmod 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
-ls -lah /output/debian-custom.iso
-
-
+ls -lah /output
