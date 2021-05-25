@@ -1,4 +1,4 @@
-name: "release"
+name: "Build Debian ISO"
 
 on:
   schedule:
@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pre-release:
-    name: "Release"
+  build-release:
+    name: "Build and Release"
     runs-on: "ubuntu-20.04"
 
     steps:
