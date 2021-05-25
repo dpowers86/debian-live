@@ -56,7 +56,7 @@ echo Make UEFI grub files
 grub-mkstandalone --format=x86_64-efi --output=$HOME/LIVE_BOOT/tmp/bootx64.efi --locales=""  --fonts="" "boot/grub/grub.cfg=$HOME/LIVE_BOOT/tmp/grub-standalone.cfg"
 
 cd $HOME/LIVE_BOOT/staging/EFI/boot
-dd if=/dev/zero of=efiboot.img bs=1M count=20
+dd if=/dev/zero of=efiboot.img bs=1M count=5
 /sbin/mkfs.vfat efiboot.img
 mmd -i efiboot.img efi efi/boot
 mcopy -vi efiboot.img $HOME/LIVE_BOOT/tmp/bootx64.efi ::efi/boot/
