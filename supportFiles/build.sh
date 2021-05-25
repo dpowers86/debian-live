@@ -12,15 +12,20 @@ echo Install Debian
 debootstrap --arch=amd64 --variant=minbase buster $HOME/LIVE_BOOT/chroot http://ftp.us.debian.org/debian/
 
 echo Copy supporting documents into the chroot
-cp /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh
-cp /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
+cp -v /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh
+cp -v /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
+
+echo Copy in systemd-networkd config
+cp -v /supportFiles/99-dhcp-en.network $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
+chown -v root:root $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
+chmod -v 644 $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
 
 echo Run install script inside chroot
 chroot $HOME/LIVE_BOOT/chroot /installChroot.sh
 
 echo Cleanup chroot
-rm $HOME/LIVE_BOOT/chroot/installChroot.sh
-mv $HOME/LIVE_BOOT/chroot/packages.txt /output/packages.txt
+rm -v $HOME/LIVE_BOOT/chroot/installChroot.sh
+mv -v $HOME/LIVE_BOOT/chroot/packages.txt /output/packages.txt
 
 echo Create directories that will contain files for our live environment files and scratch files.
 mkdir -p $HOME/LIVE_BOOT/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
@@ -29,19 +34,19 @@ echo Compress the chroot environment into a Squash filesystem.
 mksquashfs $HOME/LIVE_BOOT/chroot $HOME/LIVE_BOOT/staging/live/filesystem.squashfs -e boot
 
 echo Copy kernel and initrd
-cp $HOME/LIVE_BOOT/chroot/boot/vmlinuz-* $HOME/LIVE_BOOT/staging/live/vmlinuz
-cp $HOME/LIVE_BOOT/chroot/boot/initrd.img-* $HOME/LIVE_BOOT/staging/live/initrd
+cp -v $HOME/LIVE_BOOT/chroot/boot/vmlinuz-* $HOME/LIVE_BOOT/staging/live/vmlinuz
+cp -v $HOME/LIVE_BOOT/chroot/boot/initrd.img-* $HOME/LIVE_BOOT/staging/live/initrd
 
 echo Copy boot config files
-cp /supportFiles/isolinux.cfg $HOME/LIVE_BOOT/staging/isolinux/isolinux.cfg
-cp /supportFiles/grub.cfg $HOME/LIVE_BOOT/staging/boot/grub/grub.cfg
-cp /supportFiles/grub-standalone.cfg $HOME/LIVE_BOOT/tmp/grub-standalone.cfg
+cp -v /supportFiles/isolinux.cfg $HOME/LIVE_BOOT/staging/isolinux/isolinux.cfg
+cp -v /supportFiles/grub.cfg $HOME/LIVE_BOOT/staging/boot/grub/grub.cfg
+cp -v /supportFiles/grub-standalone.cfg $HOME/LIVE_BOOT/tmp/grub-standalone.cfg
 touch $HOME/LIVE_BOOT/staging/DEBIAN_CUSTOM
 
 echo Copy boot images
-cp /usr/lib/ISOLINUX/isolinux.bin "${HOME}/LIVE_BOOT/staging/isolinux/"
-cp /usr/lib/syslinux/modules/bios/* "${HOME}/LIVE_BOOT/staging/isolinux/"
-cp -r /usr/lib/grub/x86_64-efi/* "${HOME}/LIVE_BOOT/staging/boot/grub/x86_64-efi/"
+cp -v /usr/lib/ISOLINUX/isolinux.bin "${HOME}/LIVE_BOOT/staging/isolinux/"
+cp -v /usr/lib/syslinux/modules/bios/* "${HOME}/LIVE_BOOT/staging/isolinux/"
+cp -v -r /usr/lib/grub/x86_64-efi/* "${HOME}/LIVE_BOOT/staging/boot/grub/x86_64-efi/"
 
 echo Make UEFI grub files
 grub-mkstandalone --format=x86_64-efi --output=$HOME/LIVE_BOOT/tmp/bootx64.efi --locales=""  --fonts="" "boot/grub/grub.cfg=$HOME/LIVE_BOOT/tmp/grub-standalone.cfg"
@@ -74,6 +79,6 @@ xorriso \
     "${HOME}/LIVE_BOOT/staging"
 
 echo Copy output
-cp $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
-chmod 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
+cp -v $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
+chmod -v 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
 ls -lah /output

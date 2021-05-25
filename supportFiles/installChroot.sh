@@ -22,6 +22,9 @@ apt-get install -y bash-completion cifs-utils curl dosfstools firmware-linux-fre
 echo Clean apt post-install
 apt-get clean
 
+echo Enable systemd-networkd as network manager
+systemctl enable systemd-networkd
+
 echo Set root password
 echo "root:toor" | chpasswd
 
