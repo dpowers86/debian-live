@@ -1,0 +1,28 @@
+name: "release"
+
+on:
+  schedule:
+  # 7AM on the 1st of every month (GitHub is GMT)
+  # https://crontab.guru/#0_7_1_*_*
+    - cron: "0 7 1 * *"
+
+  workflow_dispatch:
+
+jobs:
+  pre-release:
+    name: "Release"
+    runs-on: "ubuntu-20.04"
+
+    steps:
+      - name: "Build Image"
+        run: |
+          ./build.sh
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            output/debian-custom.iso
