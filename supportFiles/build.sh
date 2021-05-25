@@ -1,0 +1,77 @@
+#!/bin/bash
+# Based from https://willhaley.com/blog/custom-debian-live-environment/
+
+echo Install required tools
+apt-get update
+apt-get -y install debootstrap squashfs-tools xorriso isolinux syslinux-efi  grub-pc-bin grub-efi-amd64-bin mtools dosfstools
+
+echo Create directory where we will make the image
+mkdir -p $HOME/LIVE_BOOT
+
+echo Install Debian
+debootstrap --arch=amd64 --variant=minbase buster $HOME/LIVE_BOOT/chroot http://ftp.us.debian.org/debian/
+
+echo Copy supporting documents into the chroot
+cp /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh
+cp /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
+
+echo Run install script inside chroot
+chroot $HOME/LIVE_BOOT/chroot /installChroot.sh
+
+echo Create directories that will contain files for our live environment files and scratch files.
+mkdir -p $HOME/LIVE_BOOT/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
+
+echo Compress the chroot environment into a Squash filesystem.
+mksquashfs $HOME/LIVE_BOOT/chroot $HOME/LIVE_BOOT/staging/live/filesystem.squashfs -e boot
+
+echo Copy kernel and initrd
+cp $HOME/LIVE_BOOT/chroot/boot/vmlinuz-* $HOME/LIVE_BOOT/staging/live/vmlinuz
+cp $HOME/LIVE_BOOT/chroot/boot/initrd.img-* $HOME/LIVE_BOOT/staging/live/initrd
+
+echo Copy boot config files
+cp /supportFiles/isolinux.cfg $HOME/LIVE_BOOT/staging/isolinux/isolinux.cfg
+cp /supportFiles/grub.cfg $HOME/LIVE_BOOT/staging/boot/grub/grub.cfg
+cp /supportFiles/grub-standalone.cfg $HOME/LIVE_BOOT/tmp/grub-standalone.cfg
+touch $HOME/LIVE_BOOT/staging/DEBIAN_CUSTOM
+
+echo Copy boot images
+cp /usr/lib/ISOLINUX/isolinux.bin "${HOME}/LIVE_BOOT/staging/isolinux/"
+cp /usr/lib/syslinux/modules/bios/* "${HOME}/LIVE_BOOT/staging/isolinux/"
+cp -r /usr/lib/grub/x86_64-efi/* "${HOME}/LIVE_BOOT/staging/boot/grub/x86_64-efi/"
+
+echo Make UEFI grub files
+grub-mkstandalone --format=x86_64-efi --output=$HOME/LIVE_BOOT/tmp/bootx64.efi --locales=""  --fonts="" "boot/grub/grub.cfg=$HOME/LIVE_BOOT/tmp/grub-standalone.cfg"
+
+cd $HOME/LIVE_BOOT/staging/EFI/boot
+dd if=/dev/zero of=efiboot.img bs=1M count=20
+/sbin/mkfs.vfat efiboot.img
+mmd -i efiboot.img efi efi/boot
+mcopy -vi efiboot.img $HOME/LIVE_BOOT/tmp/bootx64.efi ::efi/boot/
+
+echo Build ISO
+xorriso \
+    -as mkisofs \
+    -iso-level 3 \
+    -o "${HOME}/LIVE_BOOT/debian-custom.iso" \
+    -full-iso9660-filenames \
+    -volid "DEBIAN_CUSTOM" \
+    -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
+    -eltorito-boot \
+        isolinux/isolinux.bin \
+        -no-emul-boot \
+        -boot-load-size 4 \
+        -boot-info-table \
+        --eltorito-catalog isolinux/isolinux.cat \
+    -eltorito-alt-boot \
+        -e /EFI/boot/efiboot.img \
+        -no-emul-boot \
+        -isohybrid-gpt-basdat \
+    -append_partition 2 0xef ${HOME}/LIVE_BOOT/staging/EFI/boot/efiboot.img \
+    "${HOME}/LIVE_BOOT/staging"
+
+echo Copy output
+cp $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
+chmod 666 $HOME/LIVE_BOOT/debian-custom.iso /output/debian-custom.iso
+ls -lah /output/debian-custom.iso
+
+
