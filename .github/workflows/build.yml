@@ -6,6 +6,10 @@ on:
   # https://crontab.guru/#0_7_1_*_*
     - cron: "0 7 1 * *"
 
+  push:
+    paths-ignore:
+      - 'README.md'
+
   workflow_dispatch:
 
 jobs:
