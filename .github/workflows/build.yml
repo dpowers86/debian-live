@@ -19,6 +19,10 @@ jobs:
     runs-on: "ubuntu-20.04"
 
     steps:
+      - name: "Get Date"
+        run: |
+          echo "DATESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV 
+
       - name: "Checking out git repository"
         uses: actions/checkout@v2
 
@@ -30,9 +34,8 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Build"
+          automatic_release_tag: "${{ env.DATESTAMP }}"
+          title: "Debian 10 Live Minimal ISO"
           files: |
             output/debian10-live-minimal-x86_64.iso
             output/packages.txt
