@@ -15,6 +15,11 @@ echo Copy supporting documents into the chroot
 cp -v /supportFiles/installChroot.sh $HOME/LIVE_BOOT/chroot/installChroot.sh
 cp -v /supportFiles/sources.list $HOME/LIVE_BOOT/chroot/etc/apt/sources.list
 
+echo Mounting dev / proc / sys
+mount -t proc none $HOME/LIVE_BOOT/chroot/proc
+mount -o bind /dev $HOME/LIVE_BOOT/chroot/dev
+mount -o bind /sys $HOME/LIVE_BOOT/chroot/sys
+
 echo Run install script inside chroot
 chroot $HOME/LIVE_BOOT/chroot /installChroot.sh
 
@@ -30,6 +35,11 @@ chmod -v 644 $HOME/LIVE_BOOT/chroot/etc/systemd/network/99-dhcp-en.network
 echo Enable autologin
 mkdir -p -v $HOME/LIVE_BOOT/chroot/etc/systemd/system/getty@tty1.service.d/
 cp -v /supportFiles/override.conf $HOME/LIVE_BOOT/chroot/etc/systemd/system/getty@tty1.service.d/override.conf
+
+echo Unmounting dev / proc / sys
+umount $HOME/LIVE_BOOT/chroot/proc
+umount $HOME/LIVE_BOOT/chroot/dev
+umount $HOME/LIVE_BOOT/chroot/sys
 
 echo Create directories that will contain files for our live environment files and scratch files.
 mkdir -p $HOME/LIVE_BOOT/{staging/{EFI/boot,boot/grub/x86_64-efi,isolinux,live},tmp}
@@ -56,7 +66,8 @@ echo Make UEFI grub files
 grub-mkstandalone --format=x86_64-efi --output=$HOME/LIVE_BOOT/tmp/bootx64.efi --locales=""  --fonts="" "boot/grub/grub.cfg=$HOME/LIVE_BOOT/tmp/grub-standalone.cfg"
 
 cd $HOME/LIVE_BOOT/staging/EFI/boot
-dd if=/dev/zero of=efiboot.img bs=1M count=5
+SIZE=`expr $(stat --format=%s $HOME/LIVE_BOOT/tmp/bootx64.efi) + 32768`
+dd if=/dev/zero of=efiboot.img bs=$SIZE count=1
 /sbin/mkfs.vfat efiboot.img
 mmd -i efiboot.img efi efi/boot
 mcopy -vi efiboot.img $HOME/LIVE_BOOT/tmp/bootx64.efi ::efi/boot/

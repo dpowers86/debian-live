@@ -4,6 +4,9 @@
 echo Set hostname
 echo "debian-live" > /etc/hostname
 
+# Set as non-interactive so apt does not prompt for user input
+export DEBIAN_FRONTEND=noninteractive
+
 echo Install security updates and apt-utils
 apt-get update
 apt-get -y install apt-utils
