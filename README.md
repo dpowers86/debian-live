@@ -2,6 +2,9 @@
 Builds a Debian 10 (Buster) Live x86-64 ISO monthly using GitHub Actions. Used primarily for backing up and restoring Linux and Windows based systems.
 
 
+## Default Password
+The default username and password is root / toor.
+
 
 ## Installation Options
 1. Burn / mount the ISO
