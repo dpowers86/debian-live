@@ -55,6 +55,9 @@ wimtools - Create, restore, and manage `WIM` files for Windows based systems.
 * vim
 * wimtools
 * wget
+* e2fsprogs
+* zstd
+* clonezilla
 
 For a full list of installed packages, see `packages.txt` in the release.
 
